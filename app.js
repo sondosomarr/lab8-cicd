@@ -8,6 +8,20 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL
 });
 
+async function connectWithRetry() {
+  for (let i = 0; i < 10; i++) {
+    try {
+      await pool.query('SELECT 1');
+      console.log('Connected to database');
+      return;
+    } catch (err) {
+      console.log(`Waiting for database... attempt ${i + 1}`);
+      await new Promise(res => setTimeout(res, 3000));
+    }
+  }
+  throw new Error('Could not connect to database');
+}
+
 app.get('/tasks', async (req, res) => {
   const result = await pool.query('SELECT * FROM tasks');
   res.json(result.rows);
