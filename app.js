@@ -22,6 +22,8 @@ app.post('/tasks', async (req, res) => {
   res.json(result.rows[0]);
 });
 
-app.listen(3000, () => {
-  console.log('Server running on port 3000');
+connectWithRetry().then(() => {
+  app.listen(3000, () => {
+    console.log('Server running on port 3000');
+  });
 });
